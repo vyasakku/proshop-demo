@@ -1,28 +1,32 @@
 import { Pagination } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Paginate = ({ pages, page, isAdmin = false, keyword = '' }) => {
+  const navigate = useNavigate();
+
+  if (pages <= 1) return null; 
+
   return (
-    pages > 1 && (
-      <Pagination>
-        {[...Array(pages).keys()].map((x) => (
+    <Pagination>
+      {[...Array(pages).keys()].map((x) => {
+        const pageNum = x + 1;
+        const link = !isAdmin
+          ? keyword
+            ? `/search/${keyword}/page/${pageNum}`
+            : `/page/${pageNum}`
+          : `/admin/productlist/${pageNum}`;
+
+        return (
           <Pagination.Item
-            as={Link}
-            key={x + 1}
-            to={
-              !isAdmin
-                ? keyword
-                  ? `/search/${keyword}/page/${x + 1}`
-                  : `/page/${x + 1}`
-                : `/admin/productlist/${x + 1}`
-            }
-            active={x + 1 === page}
+            key={pageNum}
+            active={pageNum === page}
+            onClick={() => navigate(link)} 
           >
-            {x + 1}
+            {pageNum}
           </Pagination.Item>
-        ))}
-      </Pagination>
-    )
+        );
+      })}
+    </Pagination>
   );
 };
 
