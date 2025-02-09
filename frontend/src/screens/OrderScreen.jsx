@@ -59,12 +59,15 @@ const OrderScreen = () => {
   }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
 
   function onApprove(data, actions) {
+    console.log("✅ onApprove triggered with data:", data);
     return actions.order.capture().then(async function (details) {
+      console.log("✅ Payment captured:", details);
       try {
         await payOrder({ orderId, details });
         refetch();
-        toast.success('Order is paid');
+        toast.success("Order is paid");
       } catch (err) {
+        console.error("❌ Error in payOrder:", err);
         toast.error(err?.data?.message || err.error);
       }
     });
@@ -87,11 +90,12 @@ const OrderScreen = () => {
       .create({
         purchase_units: [
           {
-            amount: { value: order.totalPrice },
+            amount: { currency_code: "USD", value: order.totalPrice.toFixed(2) },
           },
         ],
       })
       .then((orderID) => {
+        console.log("Created PayPal Order ID:", orderID);
         return orderID;
       });
   }
@@ -232,7 +236,9 @@ const OrderScreen = () => {
                           createOrder={createOrder}
                           onApprove={onApprove}
                           onError={onError}
-                        ></PayPalButtons>
+                        >
+                        </PayPalButtons>
+                        
                       </div>
                     </div>
                   )}
